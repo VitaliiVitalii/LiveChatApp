@@ -5,7 +5,8 @@ from users.models import User
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'phone_number', 'email', 'first_name', 'last_name', 'profile_picture', 'bio']
+        fields = ['id', 'username', 'is_online', 'last_active', 'phone_number', 'email', 'first_name', 'last_name',
+                  'profile_picture', 'bio']
         extra_kwargs = {'username': {'required': False}}
 
     def create(self, validated_data):
@@ -16,4 +17,6 @@ class UserSerializer(serializers.ModelSerializer):
             user_instance = User(first_name=first_name, last_name=last_name)
             validated_data['username'] = user_instance.generate_username()
 
-        return super().create(validated_data)
+        user = super().create(validated_data)
+        print(f'Created user: {user}')
+        return user

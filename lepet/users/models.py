@@ -8,9 +8,11 @@ from django.db import models
 
 class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    phone_number = PhoneNumberField(unique=True, region='UA')  # Унікальний номер телефону
+    phone_number = PhoneNumberField(unique=True, region='UA')
     profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
-    bio = models.CharField(max_length=70, blank=True, null=True)  # Поле біо, необов'язкове
+    bio = models.CharField(max_length=70, blank=True, null=True)
+    is_online = models.BooleanField(default=False)
+    last_active = models.DateTimeField(null=True, blank=True)
 
     # Обов'язкові поля при створенні користувача
     REQUIRED_FIELDS = ['phone_number', 'first_name', 'last_name']
