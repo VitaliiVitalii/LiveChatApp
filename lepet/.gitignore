@@ -1,0 +1,11 @@
+.idea
+# Python cache
+__pycache__/
+
+# Other files and directories to ignore
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.envʼ
+.gitignore
