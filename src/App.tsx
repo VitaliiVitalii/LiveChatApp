@@ -1,12 +1,11 @@
 import './App.css'
-import Registration from './components/login/Registration'
+import MainPage from './components/MainPage/MainPage'
+
 
 function App() {
   
   return (
-    <>
-      <Registration />
-    </>
+    <MainPage />
   )
 }
 
