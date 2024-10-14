@@ -36,6 +36,11 @@ class User(AbstractUser):
 
         super(User, self).save(*args, **kwargs)
 
+    def set_password(self, raw_password):
+        """Хешує пароль перед його збереженням."""
+        from django.contrib.auth.hashers import make_password
+        self.password = make_password(raw_password)
+
     def generate_username(self):
         """Генерує username з імені та прізвища, транслітеруючи українські символи."""
         first_name_transliterated = transliterate.translit(self.first_name, 'uk', reversed=True)
