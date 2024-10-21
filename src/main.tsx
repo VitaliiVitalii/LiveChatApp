@@ -1,9 +1,9 @@
 import * as ReactDOM from "react-dom/client";
-import { StrictMode } from 'react';
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import App from './App.tsx';
 import MainPage from "./components/MainPage/MainPage.tsx";
 import Registration from './components/login/Registration.tsx';
+import './components/login/blocks/interpretator/axios.js'
 import './index.css';
 
 const router = createBrowserRouter([
@@ -21,8 +21,6 @@ const router = createBrowserRouter([
   },
 ]);
 
-ReactDOM.createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    <RouterProvider router={router} />
-  </StrictMode>
+ReactDOM.createRoot(document.getElementById("root")!).render(
+  <RouterProvider router={router} />
 );
