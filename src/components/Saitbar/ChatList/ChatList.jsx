@@ -1,9 +1,10 @@
-import { useState } from 'react'
-import './chatlist.css'
+import { useState, useEffect, useRef } from 'react';
+import './chatlist.css';
+import AddUser from './addUser/AddUser';
 
 const ChatList = () => {
-
-    const [addMode, setMode] = useState(false)
+    const [addUser, setUser] = useState(false);
+    const popupRef = useRef(null);
 
     const users = [
         { id: 1, name: 'Joy Yo', message: 'Hello', avatar: './avatar.png' },
@@ -21,14 +22,30 @@ const ChatList = () => {
         { id: 13, name: 'Sara Con', message: 'See you soon!', avatar: './avatar.png' }
     ];
 
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (popupRef.current && !popupRef.current.contains(event.target)) {
+                setUser(false);
+            }
+        };
+
+        if (addUser) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [addUser]);
+
     return (
         <div className="chatlist">
             <div className='search'>
                 <div className='searchBar'>
-                    <img src='./search.png' alt='search'/>
-                    <input type='text' placeholder='Search'/>
+                    <img src='./search.png' alt='search' />
+                    <input type='text' placeholder='Пошук' />
                 </div>
-                <img src={addMode ? './minus.png' : './plus.png'} alt='add' onClick={() => setMode((prev) => !prev)} />
+                <img src={addUser ? './minus.png' : './plus.png'} alt='add' onClick={() => setUser((prev) => !prev)} />
             </div>
             {users.map(user => (
                 <div key={user.id} className='item'>
@@ -39,8 +56,13 @@ const ChatList = () => {
                     </div>
                 </div>
             ))}
+            {addUser && (
+                <div className="popup" ref={popupRef}>
+                    <AddUser />
+                </div>
+            )}
         </div>
-    )
+    );
 }
 
-export default ChatList
+export default ChatList;
