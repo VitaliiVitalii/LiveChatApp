@@ -9,13 +9,19 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'is_online', 'last_active', 'phone_number', 'email', 'first_name', 'last_name',
-                  'profile_picture', 'bio', 'password']
-        extra_kwargs = {'username': {'required': False},
-                        'password': {'write_only': True}}
+        fields = [
+            'id', 'username', 'is_online', 'last_active', 'phone_number',
+            'email', 'first_name', 'last_name', 'profile_picture', 'bio', 'password'
+        ]
+        extra_kwargs = {
+            'username': {'required': False},
+            'password': {'write_only': True}  # Пароль тільки для запису
+        }
 
     def create(self, validated_data):
+        """Метод для створення нового користувача."""
         print(f"Received phone_number: {validated_data.get('phone_number')}")
+
         if not validated_data.get('username'):
             first_name = validated_data.get('first_name', '')
             last_name = validated_data.get('last_name', '')
@@ -23,10 +29,20 @@ class UserSerializer(serializers.ModelSerializer):
             validated_data['username'] = user_instance.generate_username()
 
         user = User(**validated_data)
-        user.set_password(validated_data.pop('password'))
+        user.set_password(validated_data.pop('password'))  # Зберігаємо пароль у зашифрованому вигляді
         user.save()
         print(f'Created user: {user}')
         return user
+
+    def update(self, instance, validated_data):
+        """Метод для оновлення даних користувача."""
+        for attr, value in validated_data.items():
+            if attr == 'password':
+                instance.set_password(value)  # Оновлюємо пароль у зашифрованому вигляді
+            else:
+                setattr(instance, attr, value)  # Оновлюємо інші атрибути
+        instance.save()
+        return instance
 
 
 class LoginSerializer(serializers.Serializer):
@@ -34,6 +50,7 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField()
 
     def validate(self, attrs):
+        """Метод для валідації даних аутентифікації."""
         phone_number = attrs.get('phone_number')
         password = attrs.get('password')
 
@@ -42,7 +59,7 @@ class LoginSerializer(serializers.Serializer):
         user = authenticate(request=self.context.get('request'), phone_number=phone_number, password=password)
 
         if user is None:
-            raise serializers.ValidationError("Invalid credentials")
+            raise serializers.ValidationError("Невірні облікові дані")
 
         attrs['user'] = user
         return attrs

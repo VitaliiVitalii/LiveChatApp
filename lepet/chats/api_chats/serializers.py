@@ -1,6 +1,5 @@
 from rest_framework import serializers
-
-from chats.models import Chat, Message
+from chats.models import Chat, Message, Reaction
 
 
 class ChatSerializer(serializers.ModelSerializer):
@@ -9,13 +8,22 @@ class ChatSerializer(serializers.ModelSerializer):
         fields = ['id', 'participants']  # Додайте поля, які вам потрібні
 
 
+class ReactionSerializer(serializers.ModelSerializer):
+    """Серіалізатор для реакцій на повідомлення."""
+
+    class Meta:
+        model = Reaction
+        fields = ['emoji']
+
+
 class MessageSerializer(serializers.ModelSerializer):
     sender = serializers.PrimaryKeyRelatedField(read_only=True)
+    reactions = ReactionSerializer(many=True, read_only=True)
 
     class Meta:
         model = Message
-        fields = ['chat', 'content', 'sender',
-                  'created_at']  # Виключаємо 'sender', будемо встановлювати його автоматично
+        fields = ['id', 'chat', 'content', 'sender',
+                  'created_at', 'reactions']  # Виключаємо 'sender', будемо встановлювати його автоматично
 
     def create(self, validated_data):
         request = self.context.get('request')

@@ -1,10 +1,10 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import generics, status
+from rest_framework import generics, status, permissions, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from chats.api_chats.serializers import ChatSerializer, MessageSerializer
-from chats.models import Chat, Message
+from chats.api_chats.serializers import ChatSerializer, MessageSerializer, ReactionSerializer
+from chats.models import Chat, Message, Reaction
 
 
 class CreateChatView(generics.CreateAPIView):
@@ -45,17 +45,30 @@ class CreateMessageView(generics.CreateAPIView):
 class ChatListView(generics.ListAPIView):
     queryset = Chat.objects.all()
     serializer_class = ChatSerializer
-    permission_classes = [IsAuthenticated]  # Дозволити тільки авторизованим користувачам
+    permission_classes = [IsAuthenticated]
 
 
 # Відображення повідомлень у конкретному чаті
+
 class MessageListView(generics.ListAPIView):
     serializer_class = MessageSerializer
-    permission_classes = [IsAuthenticated]  # Дозволити тільки авторизованим користувачам
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        chat_id = self.kwargs['chat_id']  # Отримуємо chat_id з URL
-        return Message.objects.filter(chat__id=chat_id)  # Повертаємо всі повідомлення для конкретного чату
+        chat_id = self.kwargs['chat_id']
+        return Message.objects.filter(chat__id=chat_id).select_related('author').prefetch_related('reactions')
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        # Використовуємо MessageSerializer з параметром many=True для серіалізації всіх повідомлень
+        message_data = self.get_serializer(queryset, many=True).data
+
+        for message in message_data:
+            reactions = [ReactionSerializer(reaction).data for reaction in
+                         queryset.get(id=message['id']).reactions.all()]
+            message['reactions'] = reactions
+
+        return Response(message_data)
 
 
 class UserChatsView(generics.ListAPIView):
@@ -67,3 +80,27 @@ class UserChatsView(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user  # Отримуємо аутентифікованого користувача
         return Chat.objects.filter(participants=user)  # Повертаємо чати, в яких бере участь користувач
+
+
+class ReactionCreateView(generics.CreateAPIView):
+    """Представлення для створення реакції на повідомлення."""
+
+    queryset = Reaction.objects.all()
+    serializer_class = ReactionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        message_id = self.kwargs['message_id']  # Отримуємо message_id з URL
+        message = get_object_or_404(Message, id=message_id)  # Знаходимо повідомлення по ID
+        serializer.save(user=self.request.user, message=message)  # Зберігаємо користувача і повідомлення
+
+
+class MessageReactionsView(generics.ListAPIView):
+    """Представлення для отримання всіх реакцій на конкретне повідомлення."""
+
+    serializer_class = ReactionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        message_id = self.kwargs['message_id']
+        return Reaction.objects.filter(message_id=message_id)
