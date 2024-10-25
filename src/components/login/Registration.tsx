@@ -5,10 +5,9 @@ import Input from './blocks/Input';
 const API_URL = 'https://6debfc62-2bc9-4896-a37d-958289cd0ae5.mock.pstmn.io/api/login/';
 
 const Registration: React.FC = () => {
-    const [username, setUserName] = useState('');
     const [firstName, setFirst_name] = useState('');
+    const [lastName, setLast_name] = useState('');
     const [phoneNumber, setPhone_number] = useState('');
-    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
@@ -17,10 +16,9 @@ const Registration: React.FC = () => {
         e.preventDefault();
 
         const loginData = {
-            username: username,
             first_name: firstName,
+            last_name: lastName,
             phone_number: phoneNumber,
-            email: email,
             password: password,
         };
 
@@ -30,7 +28,7 @@ const Registration: React.FC = () => {
             const response = await axios.post(API_URL, loginData, {
                 headers: {
                     'Content-Type': 'application/json',
-
+                    
                 },
 
             });
@@ -38,6 +36,14 @@ const Registration: React.FC = () => {
             setSuccessMessage('Login successful! Token: ' + response.data.token);
             setError('');
             console.log('Login successful', response.data);
+
+            localStorage.clear();
+            localStorage.setItem('access_token', data.access);
+            localStorage.setItem('refresh_token', data.refresh);
+
+            axios.defaults.headers.common['Authorization'] = 
+                                         `Bearer ${data['access']}`;
+            window.location.href = '/'
 
         } catch (error) {
             setError('Login failed. Please try again.');
@@ -54,39 +60,35 @@ const Registration: React.FC = () => {
                 <form onSubmit={handleRegistration} className="space-y-4">
                     <Input
                         type="text"
-                        id="username"
-                        placeholder="Username"
-                        name="username"
-                        value={username}
-                        onChange={(e) => setUserName(e.target.value)}
-                    />
-                    <Input
-                        type="text"
                         id="first_name"
                         placeholder="First Name"
                         name="first_name"
                         value={firstName}
                         onChange={(e) => setFirst_name(e.target.value)}
                     />
-                    <input
-                        type="email"
-                        id="email"
-                        placeholder="Email"
-                        name="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    <Input
+                        type="text"
+                        id="last_name"
+                        placeholder="Last Name"
+                        name="last_name"
+                        value={lastName}
+                        onChange={(e) => setLast_name(e.target.value)}
                     />
-                    <input
+                    <Input
+                        type="tel"
+                        id="phone_number"
+                        placeholder="Phone Number"
+                        name="phone_number"
+                        value={phoneNumber}
+                        onChange={(e) => setPhone_number(e.target.value)}
+                    />
+                    <Input
                         type="password"
                         id="password"
                         placeholder="Password"
                         name="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        required
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <button
                         type="submit"
