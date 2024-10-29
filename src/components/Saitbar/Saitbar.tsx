@@ -1,6 +1,6 @@
-import ChatList from './ChatList/ChatList';
-import UserInfo from './UserInfo/UserInfo';
-import './sidebar.css'
+import ChatList from './ChatList/ChatList'
+import './saitbar.css'
+import UserInfo from './UserInfo/UserInfo'
 
 const Saitbar = () => {
     return (
