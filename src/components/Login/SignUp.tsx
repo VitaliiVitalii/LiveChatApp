@@ -1,111 +1,80 @@
 import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-import Input from './blocks/Input';
 import './login.css';
 
+const API_URL = 'https://example.com/api/register/'; // Онови свій API
 
-
-const API_URL = 'https://6debfc62-2bc9-4896-a37d-958289cd0ae5.mock.pstmn.io/api/login/';
-
-const Registration: React.FC = () => {
-    const [firstName, setFirst_name] = useState('');
-    const [lastName, setLast_name] = useState('');
-    const [phoneNumber, setPhone_number] = useState('');
+const SignUp: React.FC = () => {
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const [successMessage, setSuccessMessage] = useState('');
+    const navigate = useNavigate();
 
-    const handleRegistration = async (e: React.FormEvent) => {
+    const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const loginData = {
-            first_name: firstName,
-            last_name: lastName,
-            phone_number: phoneNumber,
-            password: password,
-        };
-
-        console.log('Login data:', loginData);
-
         try {
-            const response = await axios.post(API_URL, loginData, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    
-                },
-
-            });
-
-            setSuccessMessage('Login successful! Token: ' + response.data.token);
-            setError('');
-            console.log('Login successful', response.data);
-
-            localStorage.clear();
-            localStorage.setItem('access_token', data.access);
-            localStorage.setItem('refresh_token', data.refresh);
-
-            axios.defaults.headers.common['Authorization'] = 
-                                        `Bearer ${data['access']}`;
-            window.location.href = '/'
-
+            const response = await axios.post(API_URL, { first_name: firstName, last_name: lastName, phone_number: phoneNumber, password });
+        
+            const { access_token } = response.data;
+            localStorage.setItem('token', access_token);
+        
+            navigate('/'); // Перенаправляємо користувача на головну сторінку
         } catch (error) {
-            setError('Login failed. Please try again.');
-            setSuccessMessage('');
-            console.error('Login error:', error);
+            setError('Registration failed. Please try again.');
+            console.log(error);
         }
     };
-    
-    //fields = ['id', 'username', 'phone_number', 'email', 'first_name', 'last_name', 'profile_picture', 'bio']
+
     return (
-        <div className='login'>
-            <div className='item'>
-                <h2>Create an Account</h2>
-                <form onSubmit={handleRegistration}>
-                    <Input
+        <div className="login">
+            <div className="item">
+                <h2>Register</h2>
+                <form onSubmit={handleRegister}>
+                    <input
+                        className="input"
                         type="text"
-                        id="first_name"
-                        placeholder="First Name"
-                        name="first_name"
                         value={firstName}
-                        onChange={(e) => setFirst_name(e.target.value)}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        placeholder="First Name"
+                        required
                     />
-                    <Input
+                    <input
+                        className="input"
                         type="text"
-                        id="last_name"
-                        placeholder="Last Name"
-                        name="last_name"
                         value={lastName}
-                        onChange={(e) => setLast_name(e.target.value)}
+                        onChange={(e) => setLastName(e.target.value)}
+                        placeholder="Last Name"
+                        required
                     />
-                    <Input
+                    <input
+                        className="input"
                         type="tel"
-                        id="phone_number"
-                        placeholder="Phone Number"
-                        name="phone_number"
                         value={phoneNumber}
-                        onChange={(e) => setPhone_number(e.target.value)}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        placeholder="Phone Number"
+                        required
                     />
-                    <Input
+                    <input
+                        className="input"
                         type="password"
-                        id="password"
-                        placeholder="Password"
-                        name="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Password"
+                        required
                     />
-                    <button
-                        type="submit"
-                    >
-                        Sign Up
-                    </button>
+                    <button type="submit" className="button">Sign Up</button>
+                    {error && <p className="error">{error}</p>}
                 </form>
-                {error && <p>{error}</p>}
-                {successMessage && <p>{successMessage}</p>}
-                <p>Don't have an account? <button onClick={togglePage}>Register here</button></p>
+                <p>
+                    Already have an account? <Link to="/login" className="link">Login here</Link>
+                </p>
             </div>
         </div>
     );
 };
 
-export default Registration;
-
+export default SignUp;
