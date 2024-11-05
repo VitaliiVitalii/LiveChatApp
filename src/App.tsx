@@ -1,13 +1,39 @@
-import './App.css'
-import Login from './components/login/Login'
+import React, { useEffect, useState } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import './App.css';
+import MainPage from './components/MainPage/MainPage';
+import SignUp from './components/login/SignUp';
+import SignIn from './components/login/SingIn'; 
+import './index.css';
 
-function App() {
-  
+const App: React.FC = () => {
+  const [user, setUser] = useState<boolean>(false);
+
+  // Check for token in localStorage when the component mounts
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      setUser(true);
+    }
+  }, []);
+
   return (
-    <>
-      <Login />
-    </>
-  )
-}
+    <div className='container'>
+      <Routes>
+        {/* Redirect to MainPage if user is authenticated, otherwise go to login */}
+        <Route
+          path="/"
+          element={<MainPage />} 
+        />
+        
+        {/* Login page */}
+        <Route path="/login" element={<SignIn />} />
 
-export default App
+        {/* Registration page */}
+        <Route path="/registration" element={<SignUp />} />
+      </Routes>
+    </div>
+  );
+};
+
+export default App;
