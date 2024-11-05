@@ -5,7 +5,7 @@ import './login.css';
 
 // Update API URLs according to your setup
 const LOGIN_API = 'https://batrak.pythonanywhere.com/api/users/login/';
-const TOKEN_API = 'https://batrak.pythonanywhere.com/api/users/token/';
+const TOKEN_API = 'https://batrak.pythonanywhere.com/api/users/token/refresh/';
 
 const SignIn: React.FC = () => {
     const [phoneNumber, setPhoneNumber] = useState('');
@@ -13,19 +13,39 @@ const SignIn: React.FC = () => {
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
+    console.log(phoneNumber);
+    
+
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
 
+        const user = {
+            phone_number: phoneNumber,
+            password: password
+        };
+        console.log(user);
+        
+
         try {
             // Step 1: Login user and authenticate
-            const loginResponse = await axios.post(LOGIN_API, { phone_number: phoneNumber, password });
-            
+            const loginResponse = await axios.post(
+                LOGIN_API,
+                user,
+                { headers: { 'Content-Type': 'application/json' }, withCredentials: true }
+            );
+
             if (loginResponse.status === 200) {
                 // Step 2: After successful login, request access and refresh tokens
-                const tokenResponse = await axios.post(TOKEN_API, { phone_number: phoneNumber, password });
-                
+                const tokenResponse = await axios.post(
+                    TOKEN_API,
+                    { phone_number: phoneNumber, password: password },
+                    { headers: { 'Content-Type': 'application/json' }, withCredentials: true }
+                );
+
                 // Step 3: Save tokens to localStorage
                 const { access, refresh } = tokenResponse.data;
+                console.log(access, refresh);
+
                 localStorage.setItem('access_token', access);
                 localStorage.setItem('refresh_token', refresh);
 
@@ -33,10 +53,16 @@ const SignIn: React.FC = () => {
                 navigate('/');
             }
         } catch (error) {
-            setError('Login failed. Please try again.');
-            console.error('Login error:', error);
+            if (axios.isAxiosError(error) && error.response) {
+                console.error('Error data:', error.response.data);
+                setError(error.response.data.detail || 'Login failed. Please try again.');
+            } else {
+                console.error('Login error:', error);
+                setError('An unexpected error occurred. Please try again.');
+            }
         }
     };
+
 
     return (
         <div className="login">

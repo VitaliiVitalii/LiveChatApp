@@ -3,7 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 import MainPage from './components/MainPage/MainPage';
 import SignUp from './components/login/SignUp';
-import SignIn from './components/login/SingIn'; // Fix import name here
+import SignIn from './components/login/SingIn'; 
 import './index.css';
 
 const App: React.FC = () => {
@@ -23,7 +23,7 @@ const App: React.FC = () => {
         {/* Redirect to MainPage if user is authenticated, otherwise go to login */}
         <Route
           path="/"
-          element={user ? <MainPage /> : <Navigate to="/" replace />} 
+          element={<MainPage />} 
         />
         
         {/* Login page */}

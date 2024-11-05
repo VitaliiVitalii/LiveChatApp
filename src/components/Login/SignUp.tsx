@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import './login.css';
 
-const API_URL = 'https://example.com/api/register/'; // Онови свій API
+const API_URL = 'https://batrak.pythonanywhere.com/api/users/';
 
 const SignUp: React.FC = () => {
     const [firstName, setFirstName] = useState('');
@@ -17,9 +17,11 @@ const SignUp: React.FC = () => {
         e.preventDefault();
 
         try {
-            const response = await axios.post(API_URL, { first_name: firstName, last_name: lastName, phone_number: phoneNumber, password });
+            const response = await axios.post(API_URL, { first_name: firstName, last_name: lastName, phone_number: phoneNumber, password: password });
         
             const { access_token } = response.data;
+            console.log(access_token);
+            
             localStorage.setItem('token', access_token);
         
             navigate('/'); // Перенаправляємо користувача на головну сторінку

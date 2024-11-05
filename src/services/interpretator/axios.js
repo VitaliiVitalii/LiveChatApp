@@ -15,7 +15,7 @@ axios.interceptors.response.use(
         console.log(refreshToken);
 
         // Attempt to refresh the access token
-        const response = await axios.post('http://localhost:8000/token/refresh/', 
+        const response = await axios.post('https://batrak.pythonanywhere.com/api/users/token/refresh/', 
           { refresh: refreshToken }, 
           { 
             headers: { 'Content-Type': 'application/json' },

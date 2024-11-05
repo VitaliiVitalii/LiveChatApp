@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import Sidebar from '../Saitbar/Saitbar';
-import Chat from '../Chat/Chat';
-import Detail from '../Detail/Detail';
+import Detail from "../Detail/Detail";
+import Sidebar from "../Saitbar/Saitbar";
+import Chat from "../Chat/Chat";
+
 
 const MainPage = () => {
     const [message, setMessage] = useState<string>('');
