@@ -7,7 +7,7 @@ import Chat from "../Chat/Chat";
 
 const MainPage = () => {
     const [message, setMessage] = useState<string>('');
-    const [loading, setLoading] = useState<boolean>(true); // To track loading state
+    const [loading, setLoading] = useState<boolean>(false); // To track loading state
     const [error, setError] = useState<string>(''); // For error messages
 
     useEffect(() => {
@@ -15,7 +15,7 @@ const MainPage = () => {
 
         // Redirect to login if no access token
         if (!accessToken) {
-            window.location.href = '/login';
+            window.location.href = '/';
             return; // Exit the effect early
         }
 

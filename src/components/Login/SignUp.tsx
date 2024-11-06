@@ -24,7 +24,7 @@ const SignUp: React.FC = () => {
             
             localStorage.setItem('token', access_token);
         
-            navigate('/'); // Перенаправляємо користувача на головну сторінку
+            navigate('/'); 
         } catch (error) {
             setError('Registration failed. Please try again.');
             console.log(error);

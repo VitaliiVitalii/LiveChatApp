@@ -5,7 +5,7 @@ import './login.css';
 
 // Update API URLs according to your setup
 const LOGIN_API = 'https://batrak.pythonanywhere.com/api/users/login/';
-const TOKEN_API = 'https://batrak.pythonanywhere.com/api/users/token/refresh/';
+/* const TOKEN_API = 'https://batrak.pythonanywhere.com/api/users/token/refresh/'; */
 
 const SignIn: React.FC = () => {
     const [phoneNumber, setPhoneNumber] = useState('');
@@ -28,17 +28,28 @@ const SignIn: React.FC = () => {
 
         try {
             // Step 1: Login user and authenticate
-            const loginResponse = await axios.post(
+            const {data} = await axios.post(
                 LOGIN_API,
                 user,
                 { headers: { 'Content-Type': 'application/json' }, withCredentials: true }
             );
+            
+            console.log(data);
+            
 
+             // Initialize the access & refresh token in localstorage.      
+            localStorage.clear();
+            localStorage.setItem('access_token', data.access);
+            localStorage.setItem('refresh_token', data.refresh);
+            axios.defaults.headers.common['Authorization'] = 
+                                            `Bearer ${data['access']}`;
+            navigate('/')
+/* 
             if (loginResponse.status === 200) {
                 // Step 2: After successful login, request access and refresh tokens
                 const tokenResponse = await axios.post(
                     TOKEN_API,
-                    { phone_number: phoneNumber, password: password },
+                    user,
                     { headers: { 'Content-Type': 'application/json' }, withCredentials: true }
                 );
 
@@ -51,7 +62,7 @@ const SignIn: React.FC = () => {
 
                 // Step 4: Navigate to the main page
                 navigate('/');
-            }
+            } */
         } catch (error) {
             if (axios.isAxiosError(error) && error.response) {
                 console.error('Error data:', error.response.data);

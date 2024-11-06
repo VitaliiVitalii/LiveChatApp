@@ -7,15 +7,15 @@ import SignIn from './components/login/SingIn';
 import './index.css';
 
 const App: React.FC = () => {
-  const [user, setUser] = useState<boolean>(false);
+/*   const [user, setUser] = useState<boolean>(false); */
 
   // Check for token in localStorage when the component mounts
-  useEffect(() => {
+/*   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
       setUser(true);
     }
-  }, []);
+  }, []); */
 
   return (
     <div className='container'>
