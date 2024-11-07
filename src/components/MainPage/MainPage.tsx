@@ -6,11 +6,11 @@ import Chat from "../Chat/Chat";
 
 
 const MainPage = () => {
-    const [message, setMessage] = useState<string>('');
-    const [loading, setLoading] = useState<boolean>(false); // To track loading state
-    const [error, setError] = useState<string>(''); // For error messages
+/*     const [message, setMessage] = useState<string>('');
+    const [loading, setLoading] = useState<boolean>(); // To track loading state
+    const [error, setError] = useState<string>(''); // For error messages */
 
-    useEffect(() => {
+    /* useEffect(() => {
         const accessToken = localStorage.getItem('token'); // Adjusted to match your token key
 
         // Redirect to login if no access token
@@ -47,19 +47,16 @@ const MainPage = () => {
                     setError('An unexpected error occurred.');
                 }
             } finally {
-                setLoading(false); // Stop loading
+                setLoading(true); // Stop loading
             }
         })();
-    }, []);
+    }, []); */
 
     return (
         <div className='container'>
             <Sidebar />
-            {loading && <p>Loading...</p>} {/* Loading indicator */}
-            {error && <p className="error">{error}</p>} {/* Error message */}
             <Chat />
             <Detail />
-            {message && <div className="message">{message}</div>} {/* Display message */}
         </div>
     );
 };
