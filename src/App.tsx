@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { Routes, Route} from 'react-router-dom';
+import React, {useEffect, useState } from 'react';
+import {Routes, Route} from 'react-router-dom';
 import './App.css';
 import MainPage from './components/MainPage/MainPage';
 import SignUp from './components/login/SignUp';
-import SignIn from './components/login/SingIn'; 
+import SignIn from './components/login/SingIn';
 import './index.css';
 
 const App: React.FC = () => {
@@ -21,19 +21,17 @@ const App: React.FC = () => {
     <div className='container'>
       <Routes>
         {/* Redirect to MainPage if user is authenticated, otherwise go to login */}
-        <Route
-          path="/"
-          element={<MainPage />} 
+        <Route path="/" element={<MainPage />} 
         />
-        
         {/* Login page */}
         <Route path="/login" element={<SignIn />} />
-
         {/* Registration page */}
         <Route path="/registration" element={<SignUp />} />
       </Routes>
     </div>
+
   );
+
 };
 
 export default App;

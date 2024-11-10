@@ -2,13 +2,13 @@ import axios from "axios";
 
 let refresh = false;
 
-axios.interceptors.response.use(
-  (response) => response, 
-  async (error) => {
+axios.interceptors.response.use(resp => resp, async error => {
     // Check if it's a 401 error and the token hasn't been refreshed yet
     if (error.response.status === 401 && !refresh) {
+
       refresh = true;
-      
+      console.log(localStorage.getItem('refresh_token'));
+
       try {
         // Log the current refresh token
         const refreshToken = localStorage.getItem('refresh_token');
