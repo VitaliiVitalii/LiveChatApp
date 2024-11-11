@@ -1,30 +1,88 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './chatlist.css';
+import { jwtDecode } from "jwt-decode";
 import AddUser from './addUser/AddUser';
+import axios from 'axios';
 
-const ChatList = () => {
-    const [addUser, setUser] = useState(false);
-    const popupRef = useRef(null);
 
-    const users = [
-        { id: 1, name: 'Joy Yo', message: 'Hello', avatar: './avatar.png' },
-        { id: 2, name: 'Anna Lee', message: 'How are you?', avatar: './avatar.png' },
-        { id: 3, name: 'Mike Dee', message: 'Good morning', avatar: './avatar.png' },
-        { id: 4, name: 'Sara Con', message: 'See you soon!', avatar: './avatar.png' },
-        { id: 5, name: 'Sara Con', message: 'See you soon!', avatar: './avatar.png' },
-        { id: 6, name: 'Sara Con', message: 'See you soon!', avatar: './avatar.png' },
-        { id: 7, name: 'Sara Con', message: 'See you soon!', avatar: './avatar.png' },
-        { id: 8, name: 'Sara Con', message: 'See you soon!', avatar: './avatar.png' },
-        { id: 9, name: 'Sara Con', message: 'See you soon!', avatar: './avatar.png' },
-        { id: 10, name: 'Sara Con', message: 'See you soon!', avatar: './avatar.png' },
-        { id: 11, name: 'Sara Con', message: 'See you soon!', avatar: './avatar.png' },
-        { id: 12, name: 'Sara Con', message: 'See you soon!', avatar: './avatar.png' },
-        { id: 13, name: 'Sara Con', message: 'See you soon!', avatar: './avatar.png' }
-    ];
+interface User {
+    id: string;
+    username: string;
+    first_name: string;
+    last_name: string;
+    profile_picture: string | null;
+}
+
+interface Chat {
+    id: number;
+    participants: string[];
+}
+
+interface MyJwtPayload {
+    user_id: string;
+}
+
+const ChatList: React.FC = () => {
+    const [addUser, setUser] = useState<boolean>(false);
+    const [chats, setChats] = useState<Chat[]>([]);
+    const popupRef = useRef<HTMLDivElement>(null);
+    const [participantsData, setParticipantsData] = useState<{ [key: string]: User }>({});
+    const yourToken = localStorage.getItem('access_token') || '';
+    const decodedToken = jwtDecode<MyJwtPayload>(yourToken);
+    const currentUserId = decodedToken.user_id;
 
     useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (popupRef.current && !popupRef.current.contains(event.target)) {
+        const fetchChats = async () => {
+            const yourToken = localStorage.getItem('access_token');
+            try {
+                const response = await axios.get('https://batrak.pythonanywhere.com/api/chats/', {
+                    headers: {
+                        Authorization: `Bearer ${yourToken}`,
+                    },
+                });
+                setChats(response.data);
+            } catch (err) {
+                console.error('Ошибка', err);
+            }
+        };
+
+        fetchChats();
+    }, []);
+
+    useEffect(() => {
+        const fetchParticipants = async () => {
+            const yourToken = localStorage.getItem('access_token');
+            const newParticipantsData: { [key: string]: User } = {};
+
+            await Promise.all(
+                chats.flatMap(chat =>
+                    chat.participants.map(async participantId => {
+                        if (!participantsData[participantId] && participantId !== currentUserId) {
+                            try {
+                                const response = await axios.get(
+                                    `https://batrak.pythonanywhere.com/api/users/${participantId}/`,
+                                    { headers: { Authorization: `Bearer ${yourToken}` } }
+                                );
+                                newParticipantsData[participantId] = response.data;
+                            } catch (err) {
+                                console.error(`Ошибка при получении пользователя ${participantId}:`, err);
+                            }
+                        }
+                    })
+                )
+            );
+
+            setParticipantsData(prevData => ({ ...prevData, ...newParticipantsData }));
+        };
+
+        if (chats.length > 0) {
+            fetchParticipants();
+        }
+    }, [chats]);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (popupRef.current && !popupRef.current.contains(event.target as Node)) {
                 setUser(false);
             }
         };
@@ -42,17 +100,30 @@ const ChatList = () => {
         <div className="chatlist">
             <div className='search'>
                 <div className='searchBar'>
-                    <img src='./search.png' alt='search' />
-                    <input type='text' placeholder='Пошук' />
+                    <img src='./search.png' alt='поиск' />
+                    <input type='text' placeholder='Поиск' />
                 </div>
-                <img src={addUser ? './minus.png' : './plus.png'} alt='add' onClick={() => setUser((prev) => !prev)} />
+                <img src={addUser ? './minus.png' : './plus.png'} alt='добавить' onClick={() => setUser(prev => !prev)} />
             </div>
-            {users.map(user => (
-                <div key={user.id} className='item'>
-                    <img src={user.avatar} alt='avatar' />
+            {chats.map(chat => (
+                <div key={chat.id}>
                     <div className='texts'>
-                        <span>{user.name}</span>
-                        <p>{user.message}</p>
+                        {chat.participants
+                            .filter(participantId => participantId !== currentUserId)
+                            .map(participantId => {
+                                const participant = participantsData[participantId];
+                                return participant ? (
+                                    <div key={participantId} className='item'>
+                                        <img src={participant.profile_picture || './avatar.png'} alt="аватар участника" />
+                                        <div className='texts'>
+                                            <span>{participant.first_name} {participant.last_name}</span>
+                                            <p>I love play game</p>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <p key={participantId}>Loading...</p>
+                                );
+                            })}
                     </div>
                 </div>
             ))}
@@ -63,6 +134,6 @@ const ChatList = () => {
             )}
         </div>
     );
-}
+};
 
 export default ChatList;
