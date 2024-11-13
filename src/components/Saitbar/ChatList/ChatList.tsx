@@ -16,6 +16,8 @@ interface User {
 interface Chat {
     id: number;
     participants: string[];
+    last_message: string | null;
+    content: string;
 }
 
 interface MyJwtPayload {
@@ -117,7 +119,7 @@ const ChatList: React.FC = () => {
                                         <img src={participant.profile_picture || './avatar.png'} alt="аватар участника" />
                                         <div className='texts'>
                                             <span>{participant.first_name} {participant.last_name}</span>
-                                            <p>I love play game</p>
+                                            <p>{chat.last_message?.content}</p>
                                         </div>
                                     </div>
                                 ) : (

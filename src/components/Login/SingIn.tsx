@@ -15,16 +15,15 @@ const SignIn: React.FC = () => {
 
     console.log(phoneNumber);
     
-
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
 
         const user = {
             phone_number: phoneNumber,
             password: password
+            
         };
         console.log(user);
-        
 
         try {
             // Step 1: Login user and authenticate
@@ -36,13 +35,15 @@ const SignIn: React.FC = () => {
             
             console.log(data);
             
-
              // Initialize the access & refresh token in localstorage.      
             localStorage.clear();
+
             localStorage.setItem('access_token', data.access);
+
             localStorage.setItem('refresh_token', data.refresh);
-            axios.defaults.headers.common['Authorization'] = 
-                                            `Bearer ${data['access']}`;
+            
+            axios.defaults.headers.common['Authorization'] = `Bearer ${data['access']}`;
+
             navigate('/')
 /* 
             if (loginResponse.status === 200) {
