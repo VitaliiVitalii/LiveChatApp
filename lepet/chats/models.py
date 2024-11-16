@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from users.models import User
 
 
@@ -7,6 +9,9 @@ class Chat(models.Model):
 
     participants = models.ManyToManyField(User, related_name='chats')
     created_at = models.DateTimeField(auto_now_add=True)  # Дата та час створення чату
+    last_message = models.ForeignKey(
+        'Message', null=True, blank=True, on_delete=models.SET_NULL, related_name='last_message_in_chat'
+    )
 
     def __str__(self):
         """Повертає рядкове представлення чату."""
@@ -44,6 +49,13 @@ class Message(models.Model):
     def __str__(self):
         """Повертає рядкове представлення повідомлення."""
         return f"Повідомлення від {self.sender.username} у чаті {self.chat.id}"
+
+
+@receiver(post_save, sender=Message)
+def update_last_message(sender, instance, created, **kwargs):
+    if created:  # Якщо повідомлення було тільки що створене
+        instance.chat.last_message = instance
+        instance.chat.save()
 
 
 class Reaction(models.Model):

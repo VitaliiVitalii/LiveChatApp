@@ -15,7 +15,7 @@ class UserSerializer(serializers.ModelSerializer):
         ]
         extra_kwargs = {
             'username': {'required': False},
-            'password': {'write_only': True}  # Пароль тільки для запису
+            'password': {'write_only': True}
         }
 
     def create(self, validated_data):
@@ -29,7 +29,7 @@ class UserSerializer(serializers.ModelSerializer):
             validated_data['username'] = user_instance.generate_username()
 
         user = User(**validated_data)
-        user.set_password(validated_data.pop('password'))  # Зберігаємо пароль у зашифрованому вигляді
+        user.set_password(validated_data.pop('password'))
         user.save()
         print(f'Created user: {user}')
         return user
@@ -38,9 +38,9 @@ class UserSerializer(serializers.ModelSerializer):
         """Метод для оновлення даних користувача."""
         for attr, value in validated_data.items():
             if attr == 'password':
-                instance.set_password(value)  # Оновлюємо пароль у зашифрованому вигляді
+                instance.set_password(value)
             else:
-                setattr(instance, attr, value)  # Оновлюємо інші атрибути
+                setattr(instance, attr, value)
         instance.save()
         return instance
 
