@@ -1,3 +1,5 @@
+import React from "react";
+
 const Logout = () => {
   const isAuthenticated = localStorage.getItem('token'); 
 

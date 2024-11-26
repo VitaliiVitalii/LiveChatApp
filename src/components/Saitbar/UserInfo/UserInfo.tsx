@@ -1,3 +1,4 @@
+import React from 'react'
 import { useState } from 'react'
 import './userInfo.css'
 import ProfileInfo from './profileInfo/ProfileInfo'

@@ -5,6 +5,7 @@ import AddUser from './addUser/AddUser';
 import axios from 'axios';
 
 
+
 interface User {
     id: string;
     username: string;
@@ -16,8 +17,7 @@ interface User {
 interface Chat {
     id: number;
     participants: string[];
-    last_message: string | null;
-    content: string;
+    last_message: { content: string } | null;
 }
 
 interface MyJwtPayload {
@@ -32,6 +32,7 @@ const ChatList: React.FC = () => {
     const yourToken = localStorage.getItem('access_token') || '';
     const decodedToken = jwtDecode<MyJwtPayload>(yourToken);
     const currentUserId = decodedToken.user_id;
+    const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
 
     useEffect(() => {
         const fetchChats = async () => {
@@ -98,6 +99,11 @@ const ChatList: React.FC = () => {
         };
     }, [addUser]);
 
+    const handleChatClick = (chatId: number) => {
+        setSelectedChatId(chatId);
+        console.log("ID:", chatId);
+    };
+
     return (
         <div className="chatlist">
             <div className='search'>
@@ -108,7 +114,7 @@ const ChatList: React.FC = () => {
                 <img src={addUser ? './minus.png' : './plus.png'} alt='добавить' onClick={() => setUser(prev => !prev)} />
             </div>
             {chats.map(chat => (
-                <div key={chat.id}>
+                <div key={chat.id} onClick={() => handleChatClick(chat.id)}>
                     <div className='texts'>
                         {chat.participants
                             .filter(participantId => participantId !== currentUserId)
