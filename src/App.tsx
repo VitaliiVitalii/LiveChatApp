@@ -5,6 +5,7 @@ import MainPage from './components/MainPage/MainPage';
 import SignUp from './components/Login/SignUp';
 import SignIn from './components/Login/SingIn';
 import './index.css';
+import { ChatProvider } from "./context/Context.tsx";
 
 const App: React.FC = () => {
 /*   const [user, setUser] = useState<boolean>(false); */
@@ -19,6 +20,7 @@ const App: React.FC = () => {
 
   return (
     <div className='container'>
+      <ChatProvider>
       <Routes>
         {/* Redirect to MainPage if user is authenticated, otherwise go to login */}
         <Route path="/" element={<MainPage />} 
@@ -28,6 +30,7 @@ const App: React.FC = () => {
         {/* Registration page */}
         <Route path="/registration" element={<SignUp />} />
       </Routes>
+      </ChatProvider>
     </div>
 
   );

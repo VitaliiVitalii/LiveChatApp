@@ -3,6 +3,7 @@ import "./chat.css";
 import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import { useChatContext } from "./../../context/Context.tsx";
 
 interface Message {
   id: number;
@@ -24,8 +25,8 @@ const Chat: React.FC = () => {
   const decodedToken = jwtDecode<MyJwtPayload>(yourToken);
   const currentUserId = decodedToken.user_id;
 
-  const chatId = "3"; // ID вашого чату
-  const API_MESSAGE = `https://batrak.pythonanywhere.com/api/chats/${chatId}/messages/`;
+  const { selectedChatId } = useChatContext();
+  const API_MESSAGE = `https://batrak.pythonanywhere.com/api/chats/${selectedChatId}/messages/`;
   const API_SEND_MESSAGE = "https://batrak.pythonanywhere.com/api/chats/messages/create/";
 
   useEffect(() => {
@@ -76,7 +77,7 @@ const Chat: React.FC = () => {
     }
 
     const body = {
-      chat: chatId,
+      chat: selectedChatId,
       content: text,
     };
 
@@ -110,7 +111,7 @@ const Chat: React.FC = () => {
           <img src="./avatar.png" alt="avatar" />
           <div className="texts">
             <span>Joy Yo</span>
-            <p>Chat with ID {chatId}</p>
+            <p>Chat with ID {selectedChatId}</p>
           </div>
         </div>
         <div className="icons">

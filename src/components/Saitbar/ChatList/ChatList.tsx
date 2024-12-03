@@ -3,6 +3,7 @@ import './chatlist.css';
 import { jwtDecode } from "jwt-decode";
 import AddUser from './addUser/AddUser';
 import axios from 'axios';
+import { useChatContext } from "./../../../context/Context.tsx";
 
 
 
@@ -32,7 +33,8 @@ const ChatList: React.FC = () => {
     const yourToken = localStorage.getItem('access_token') || '';
     const decodedToken = jwtDecode<MyJwtPayload>(yourToken);
     const currentUserId = decodedToken.user_id;
-    const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
+    // const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
+    const { setSelectedChatId } = useChatContext();
 
     useEffect(() => {
         const fetchChats = async () => {
