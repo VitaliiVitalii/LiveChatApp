@@ -1,11 +1,17 @@
+import React from 'react'
 import './detail.css'
+import { useChatContext } from "./../../context/Context.tsx";
+
 
 const Detail = () => {
+
+    const { selectedChatId, selectedChatName } = useChatContext();
+
     return (
         <div className="detail">
             <div className="user">
                 <img src='./avatar.png' alt='avatar' />
-                <h2>Joy Yo</h2>
+                <h2>{selectedChatName?.first_name} {selectedChatName?.last_name}</h2>
                 <p>I love to track and always do it and my goal is to track 25,000 OPF</p>
             </div>
             <div className="info">

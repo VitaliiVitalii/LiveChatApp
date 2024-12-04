@@ -33,7 +33,6 @@ const ChatList: React.FC = () => {
     const yourToken = localStorage.getItem('access_token') || '';
     const decodedToken = jwtDecode<MyJwtPayload>(yourToken);
     const currentUserId = decodedToken.user_id;
-    // const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
     const { setSelectedChatId } = useChatContext();
 
     useEffect(() => {
@@ -101,10 +100,9 @@ const ChatList: React.FC = () => {
         };
     }, [addUser]);
 
-    const handleChatClick = (chatId: number) => {
-        setSelectedChatId(chatId);
-        console.log("ID:", chatId);
-    };
+    const handleChatClick = (chatId: number, firstName: string, lastName: string) => {
+        setSelectedChatId(chatId, { first_name: firstName, last_name: lastName });
+      };
 
     return (
         <div className="chatlist">
@@ -116,14 +114,14 @@ const ChatList: React.FC = () => {
                 <img src={addUser ? './minus.png' : './plus.png'} alt='добавить' onClick={() => setUser(prev => !prev)} />
             </div>
             {chats.map(chat => (
-                <div key={chat.id} onClick={() => handleChatClick(chat.id)}>
+                <div>
                     <div className='texts'>
                         {chat.participants
                             .filter(participantId => participantId !== currentUserId)
                             .map(participantId => {
                                 const participant = participantsData[participantId];
                                 return participant ? (
-                                    <div key={participantId} className='item'>
+                                    <div key={participantId} className='item' onClick={() => handleChatClick(chat.id, participant?.first_name || 'Unknown', participant?.last_name || 'Unknown')}>
                                         <img src={participant.profile_picture || './avatar.png'} alt="аватар участника" />
                                         <div className='texts'>
                                             <span>{participant.first_name} {participant.last_name}</span>

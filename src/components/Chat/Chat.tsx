@@ -25,12 +25,11 @@ const Chat: React.FC = () => {
   const decodedToken = jwtDecode<MyJwtPayload>(yourToken);
   const currentUserId = decodedToken.user_id;
 
-  const { selectedChatId } = useChatContext();
+  const { selectedChatId, selectedChatName } = useChatContext();
   const API_MESSAGE = `https://batrak.pythonanywhere.com/api/chats/${selectedChatId}/messages/`;
   const API_SEND_MESSAGE = "https://batrak.pythonanywhere.com/api/chats/messages/create/";
 
   useEffect(() => {
-    // Отримання повідомлень
     const fetchMessages = async () => {
       const yourToken = localStorage.getItem("access_token");
       if (!yourToken) {
@@ -72,7 +71,6 @@ const Chat: React.FC = () => {
 
   const handleSendMessage = async () => {
     if (!text.trim()) {
-      // Якщо текст порожній, нічого не відправляємо
       return;
     }
 
@@ -89,16 +87,15 @@ const Chat: React.FC = () => {
         },
       });
 
-      // Додаємо нове повідомлення в локальний список
       const newMessage: Message = {
-        id: response.data.id, // ID з відповіді сервера
-        sender: currentUserId, // Поточний користувач
-        content: text, // Відправлений текст
-        created_at: new Date().toISOString(), // Поточний час
+        id: response.data.id, 
+        sender: currentUserId, 
+        content: text, 
+        created_at: new Date().toISOString(),
       };
 
-      setMessages((prev) => [...prev, newMessage]); // Оновлюємо список повідомлень
-      setText(""); // Очищаємо поле вводу
+      setMessages((prev) => [...prev, newMessage]);
+      setText("");
     } catch (err: any) {
       console.error("Помилка при надсиланні повідомлення:", err);
     }
@@ -110,7 +107,7 @@ const Chat: React.FC = () => {
         <div className="user">
           <img src="./avatar.png" alt="avatar" />
           <div className="texts">
-            <span>Joy Yo</span>
+          <span>{selectedChatName?.first_name} {selectedChatName?.last_name}</span>
             <p>Chat with ID {selectedChatId}</p>
           </div>
         </div>
